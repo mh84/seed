@@ -540,20 +540,20 @@ impl<Ms, Mdl, ElC: View<Ms> + 'static> App<Ms, Mdl, ElC> {
             let child_old = old_children_iter.next().unwrap();
             let child_new = new_children_iter.next().unwrap();
 
-            if let Some(new_el_ws) = patch::patch(
-                &self.cfg.document,
-                child_old,
-                child_new,
-                &self.cfg.mount_point,
-                match last_visited_node.as_ref() {
-                    Some(node) => node.next_sibling(),
-                    None => self.cfg.mount_point.first_child(),
-                },
-                &self.mailbox(),
-                &self.clone(),
-            ) {
-                last_visited_node = Some(new_el_ws.clone());
-            }
+//            if let Some(new_el_ws) = patch::patch(
+//                &self.cfg.document,
+//                child_old,
+//                child_new,
+//                &self.cfg.mount_point,
+//                match last_visited_node.as_ref() {
+//                    Some(node) => node.next_sibling(),
+//                    None => self.cfg.mount_point.first_child(),
+//                },
+//                &self.mailbox(),
+//                &self.clone(),
+//            ) {
+//                last_visited_node = Some(new_el_ws.clone());
+//            }
         }
 
         for child_new in new_children_iter {
