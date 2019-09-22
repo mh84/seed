@@ -170,7 +170,7 @@ pub struct AppBuilder<Ms: 'static, Mdl: 'static, ElC: View<Ms>, GMs> {
     sink: Option<SinkFn<Ms, Mdl, ElC, GMs>>,
     view: ViewFn<Mdl, ElC>,
     mount_point: Option<Element>,
-    routes: Option<RoutesFn<Ms>>,
+    routes_: Option<RoutesFn<Ms>>,
     window_events: Option<WindowEvents<Ms, Mdl>>,
 }
 
@@ -205,7 +205,7 @@ impl<Ms, Mdl, ElC: View<Ms> + 'static, GMs: 'static> AppBuilder<Ms, Mdl, ElC, GM
 
     /// Registers a function which maps URLs to messages.
     pub fn routes(mut self, routes: RoutesFn<Ms>) -> Self {
-        self.routes = Some(routes);
+        self.routes_ = Some(routes);
         self
     }
 
@@ -239,15 +239,23 @@ impl<Ms, Mdl, ElC: View<Ms> + 'static, GMs: 'static> AppBuilder<Ms, Mdl, ElC, GM
             self.sink,
             self.view,
             self.mount_point.unwrap(),
-            self.routes,
+            self.routes_,
             self.window_events,
         );
 
         let mut initial_orders = OrdersContainer::new(app.clone());
-        let model = (self.init)(routing::initial_url(), &mut initial_orders);
+        let mut model = (self.init)(routing::initial_url(), &mut initial_orders);
+//        let model = (self.init)(routing::initial(self.update, routes), &mut initial_orders);
 
         app.cfg.initial_orders.replace(Some(initial_orders));
-        app.data.model.replace(Some(model));
+//        app.data.model.replace(Some(model));
+
+        if let Some(r) = self.routes_ {
+//            let initial_routing_msg
+            if let Some(initial_routing_msg)= r(routing::initial_url()) {
+                (self.update)(initial_routing_msg, &mut model, &mut OrdersContainer::new(app.clone()));
+            }
+        }
 
         app
     }
@@ -270,7 +278,7 @@ impl<Ms, Mdl, ElC: View<Ms> + 'static, GMs: 'static> App<Ms, Mdl, ElC, GMs> {
             view,
             sink: None,
             mount_point: None,
-            routes: None,
+            routes_: None,
             window_events: None,
         }
     }

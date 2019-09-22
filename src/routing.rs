@@ -144,6 +144,8 @@ pub fn initial_url() -> Url {
         _ => Some(raw_search),
     };
 
+    crate::log(&path);
+
     Url {
         path,
         hash,
